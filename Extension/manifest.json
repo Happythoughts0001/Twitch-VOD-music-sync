@@ -1,0 +1,23 @@
+{
+    "name": "VOD music sync",
+    "description": "Does some spaghetti code to make music in VOD",
+    "content_scripts": [
+        {
+            "matches": ["https://www.twitch.tv/videos/*"],
+            "js": ["popup.js"],
+            "run_at": "document_end"
+        }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": ["song.json"],
+            "matches": ["<all_urls>"]
+        }
+    ],
+    "version": "1.2",
+    "manifest_version": 3,
+    "permissions": ["storage", "activeTab", "scripting", "webNavigation"],
+    "action": {
+        "default_popup": "popup.html"
+    }
+}
