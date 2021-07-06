@@ -57,8 +57,23 @@
 const axios = require("axios");
 const secretData = require("./secretThings.json");
 const fs = require("fs");
+const { setTimeout } = require("timers");
 const lastFMUsername = "happythoughts01";
 const twitchChannelCode = "32258140"; // get this via twich API from username
+const twitchIDs = [
+    "1074413451",
+    "1073382214",
+    "1072312920",
+    "1071254636",
+    "1070242903",
+    "1069293471",
+    "1067135453",
+    "1066103014",
+];
+
+const sleep = (milliseconds) => {
+    return new Promise((resolve) => setTimeout(resolve, milliseconds));
+};
 
 const twitchID = async () => {
     const VODresponse = await axios({
@@ -71,30 +86,57 @@ const twitchID = async () => {
     });
     let VODID;
     let StreamerTimestamp;
-    VODresponse.data.videos.forEach((video) => {
-        if (new Date().getDate() === new Date(video.created_at).getDate()) {
-            StreamerTimestamp = Date.now() - Date.parse(video.created_at);
-            VODID = video._id.substring(1);
+    let latestVOD = VODresponse.data.videos.reduce((latest, current) => {
+        if (
+            !latest ||
+            Date.parse(current.created_at) > Date.parse(latest.created_at)
+        ) {
+            latest = current;
         }
+        return latest;
     });
+
+    StreamerTimestamp = Date.now() - Date.parse(latestVOD.created_at);
+    VODID = latestVOD._id.substring(1);
 
     lastFMresponse = await axios({
         method: "get",
         url: `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${lastFMUsername}&api_key=${secretData.lastFMAPI}&format=json&nowplaying="true"`,
     });
 
-    var data = {
-        ID: VODID,
-        data: {
-            song: lastFMresponse.data.recenttracks.track[0].name,
-            timestamp: StreamerTimestamp,
-        },
+    let mostRecent = lastFMresponse.data.recenttracks.track[0].name;
+    let i = 0;
+
+    const dosomething = async () => {
+        if (i % 10 == 0) {
+            lastFMresponse = await axios({
+                method: "get",
+                url: `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${lastFMUsername}&api_key=${secretData.lastFMAPI}&format=json&nowplaying="true"`,
+            });
+            console.log("sent request to LastFM");
+        }
+        console.log(i++, " seconds into song");
+        if (lastFMresponse.data.recenttracks.track[0].name === mostRecent) {
+            await sleep(1000);
+            dosomething();
+        } else {
+            var data = {
+                song: lastFMresponse.data.recenttracks.track[0].name,
+                artist: lastFMresponse.data.recenttracks.track[0].artist,
+                timestamp: StreamerTimestamp,
+            };
+
+            var fileObject = JSON.parse(fs.readFileSync("song.json"));
+            fileObject[VODID].push(data);
+
+            fs.writeFileSync("song.json", JSON.stringify(fileObject, null, 4));
+            mostRecent = lastFMresponse.data.recenttracks.track[0].name;
+            console.log("wrote to file");
+            i = 0;
+            dosomething();
+        }
     };
-
-    var fileObject = JSON.parse(fs.readFileSync("song.json"));
-    fileObject.push(data);
-
-    fs.writeFileSync("song.json", JSON.stringify(fileObject, null, 4));
+    dosomething();
 };
 
 twitchID();

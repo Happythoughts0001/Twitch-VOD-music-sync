@@ -1,30 +1,12 @@
-[
-    {
-        "ID": "1078337908",
-        "data": {
-            "song": "Seaweed",
-            "timestamp": 23992582
+{
+    "1077318886": [
+        {
+            "song": "Reverie - Above & Beyond Club Mix",
+            "artist": {
+                "mbid": "",
+                "#text": "Above & Beyond"
+            },
+            "timestamp": 118426814
         }
-    },
-    {
-        "ID": "1078337908",
-        "data": {
-            "song": "8 Money",
-            "timestamp": 24035481
-        }
-    },
-    {
-        "ID": "1078337908",
-        "data": {
-            "song": "8 Money",
-            "timestamp": 24171790
-        }
-    },
-    {
-        "ID": "1078337908",
-        "data": {
-            "song": "All Parts Equal",
-            "timestamp": 24303555
-        }
-    }
-]
+    ]
+}
