@@ -57,19 +57,9 @@
 const axios = require("axios");
 const secretData = require("./secretThings.json");
 const fs = require("fs");
-const { setTimeout } = require("timers");
 const lastFMUsername = "happythoughts01";
+const lastFMPollInterval = 1000;
 const twitchChannelCode = "32258140"; // get this via twich API from username
-const twitchIDs = [
-    "1074413451",
-    "1073382214",
-    "1072312920",
-    "1071254636",
-    "1070242903",
-    "1069293471",
-    "1067135453",
-    "1066103014",
-];
 
 const sleep = (milliseconds) => {
     return new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -84,59 +74,48 @@ const twitchID = async () => {
         },
         url: `https://api.twitch.tv/kraken/channels/${twitchChannelCode}/videos?sort=time`,
     });
-    let VODID;
-    let StreamerTimestamp;
+
     let latestVOD = VODresponse.data.videos.reduce((latest, current) => {
-        if (
-            !latest ||
-            Date.parse(current.created_at) > Date.parse(latest.created_at)
-        ) {
+        if (!latest || Date.parse(current.created_at) > Date.parse(latest.created_at)) {
             latest = current;
         }
         return latest;
     });
+    let VODID = latestVOD._id.substring(1);
+    let StreamerTimestamp = Date.now() - Date.parse(latestVOD.created_at);
 
-    StreamerTimestamp = Date.now() - Date.parse(latestVOD.created_at);
-    VODID = latestVOD._id.substring(1);
+    let mostRecent;
+    while (true) { // This loop runs at the interval defined by lastFMPollInterval
+        let lastFMResponse = await axios({
+            method: "get",
+            url: `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${lastFMUsername}&api_key=${secretData.lastFMAPI}&format=json&nowplaying="true"`,
+        });
+        console.log("sent request to LastFM");
 
-    lastFMresponse = await axios({
-        method: "get",
-        url: `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${lastFMUsername}&api_key=${secretData.lastFMAPI}&format=json&nowplaying="true"`,
-    });
+        let song = lastFMResponse.data.recenttracks.track[0];
+        
+        if (!mostRecent || song.name != mostRecent.name) {
+            // New song started playing since last check
+            mostRecent = song;
 
-    let mostRecent = lastFMresponse.data.recenttracks.track[0].name;
-    let i = 0;
-
-    const dosomething = async () => {
-        if (i % 10 == 0) {
-            lastFMresponse = await axios({
-                method: "get",
-                url: `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${lastFMUsername}&api_key=${secretData.lastFMAPI}&format=json&nowplaying="true"`,
-            });
-            console.log("sent request to LastFM");
-        }
-        console.log(i++, " seconds into song");
-        if (lastFMresponse.data.recenttracks.track[0].name === mostRecent) {
-            await sleep(1000);
-            dosomething();
-        } else {
             var data = {
-                song: lastFMresponse.data.recenttracks.track[0].name,
-                artist: lastFMresponse.data.recenttracks.track[0].artist,
-                timestamp: StreamerTimestamp,
+                song: song.name,
+                artist: song.artist,
+                timestamp: StreamerTimestamp
             };
-
+        
             var fileObject = JSON.parse(fs.readFileSync("song.json"));
-            fileObject[VODID].push(data);
 
+            fileObject[VODID] = fileObject[VODID] || []; // Create an entry for the VOD if it does not exist
+            fileObject[VODID].push(data); // Add the currently playing song
+        
             fs.writeFileSync("song.json", JSON.stringify(fileObject, null, 4));
-            mostRecent = lastFMresponse.data.recenttracks.track[0].name;
             console.log("wrote to file");
-            i = 0;
-            dosomething();
         }
-    };
-    dosomething();
+
+        await sleep(lastFMPollInterval);
+    }
+    
 };
 
 twitchID();
