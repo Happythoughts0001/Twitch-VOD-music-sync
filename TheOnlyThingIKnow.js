@@ -57,6 +57,8 @@
 const axios = require("axios");
 const secretData = require("./secretThings.json");
 const fs = require("fs");
+const lastFMUsername = "happythoughts01";
+const twitchChannelCode = "32258140"; // get this via twich API from username
 
 const twitchID = async () => {
     const VODresponse = await axios({
@@ -65,7 +67,7 @@ const twitchID = async () => {
             "Client-ID": `${secretData.twitchAPI}`,
             Accept: "application/vnd.twitchtv.v5+json",
         },
-        url: "https://api.twitch.tv/kraken/channels/32258140/videos?sort=time",
+        url: `https://api.twitch.tv/kraken/channels/${twitchChannelCode}/videos?sort=time`,
     });
     let VODID;
     let StreamerTimestamp;
@@ -78,8 +80,9 @@ const twitchID = async () => {
 
     lastFMresponse = await axios({
         method: "get",
-        url: `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${lastFM.username}&api_key=${secretData.lastFMAPI}&format=json&nowplaying="true"`,
+        url: `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${lastFMUsername}&api_key=${secretData.lastFMAPI}&format=json&nowplaying="true"`,
     });
+
     var data = {
         ID: VODID,
         data: {
