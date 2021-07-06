@@ -82,7 +82,6 @@ const twitchID = async () => {
         return latest;
     });
     let VODID = latestVOD._id.substring(1);
-    let StreamerTimestamp = Date.now() - Date.parse(latestVOD.created_at);
 
     let mostRecent;
     while (true) { // This loop runs at the interval defined by lastFMPollInterval
@@ -101,7 +100,7 @@ const twitchID = async () => {
             var data = {
                 song: song.name,
                 artist: song.artist,
-                timestamp: StreamerTimestamp
+                timestamp: Date.now() - Date.parse(latestVOD.created_at)
             };
         
             var fileObject = JSON.parse(fs.readFileSync("song.json"));
