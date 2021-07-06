@@ -49,37 +49,42 @@
     Create a new file for each VOD iterate through files.
     Huge file iterate through to find unique VODID
 
+
+    How do we get the streamers timestamp?
+    When we started -> when a new song is detected -> saved into the file
 */
 // code here
 const axios = require("axios");
-const secretData = require("./secretThings.js");
+const secretData = require("./secretThings.json");
 const fs = require("fs");
 
 const twitchID = async () => {
     const VODresponse = await axios({
         method: "get",
         headers: {
-            "Client-ID": `${secretData.clientID}`,
+            "Client-ID": `${secretData.twitchAPI}`,
             Accept: "application/vnd.twitchtv.v5+json",
         },
         url: "https://api.twitch.tv/kraken/channels/32258140/videos?sort=time",
     });
     let VODID;
+    let StreamerTimestamp;
     VODresponse.data.videos.forEach((video) => {
         if (new Date().getDate() === new Date(video.created_at).getDate()) {
+            StreamerTimestamp = Date.now() - Date.parse(video.created_at);
             VODID = video._id.substring(1);
         }
     });
 
     lastFMresponse = await axios({
         method: "get",
-        url: `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=HappyThoughts01&api_key=${secretData.lastID}&format=json&nowplaying="true"`,
+        url: `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${lastFM.username}&api_key=${secretData.lastFMAPI}&format=json&nowplaying="true"`,
     });
     var data = {
         ID: VODID,
         data: {
             song: lastFMresponse.data.recenttracks.track[0].name,
-            timestamp: new Date(),
+            timestamp: StreamerTimestamp,
         },
     };
 

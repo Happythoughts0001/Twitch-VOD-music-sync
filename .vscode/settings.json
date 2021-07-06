@@ -1,6 +1,6 @@
 {
     "files.exclude": {
-        "secretThings.js": true,
+        "secretThings.json": true,
         "workspace.code-workspace": true
     }
 }
