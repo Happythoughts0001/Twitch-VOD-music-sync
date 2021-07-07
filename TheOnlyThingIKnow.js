@@ -65,6 +65,16 @@ const sleep = (milliseconds) => {
     return new Promise((resolve) => setTimeout(resolve, milliseconds));
 };
 
+const addSongToVOD = (VODID, data) => {
+    let fileObject = JSON.parse(fs.readFileSync("song.json"));
+
+    fileObject[VODID] = fileObject[VODID] ?? []; // Create an entry for the VOD if it does not exist
+    fileObject[VODID].push(data);
+
+    fs.writeFileSync("song.json", JSON.stringify(fileObject, null, 4));
+    console.log("wrote to file");
+}
+
 const twitchID = async () => {
     const VODresponse = await axios({
         method: "get",
@@ -75,11 +85,8 @@ const twitchID = async () => {
         url: `https://api.twitch.tv/kraken/channels/${twitchChannelCode}/videos?sort=time`,
     });
 
-    let latestVOD = VODresponse.data.videos.reduce((latest, current) => {
-        if (!latest || Date.parse(current.created_at) > Date.parse(latest.created_at)) {
-            latest = current;
-        }
-        return latest;
+    let latestVOD = VODresponse.data.videos.reduce((latest, video) => {
+        return (Date.parse(video.created_at) > Date.parse(latest.created_at)) ? video : latest;
     });
     let VODID = latestVOD._id.substring(1);
 
@@ -87,29 +94,40 @@ const twitchID = async () => {
     while (true) { // This loop runs at the interval defined by lastFMPollInterval
         let lastFMResponse = await axios({
             method: "get",
-            url: `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${lastFMUsername}&api_key=${secretData.lastFMAPI}&format=json&nowplaying="true"`,
+            url: `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${lastFMUsername}&api_key=${secretData.lastFMAPI}&format=json`,
         });
         console.log("sent request to LastFM");
 
         let song = lastFMResponse.data.recenttracks.track[0];
-        
-        if (!mostRecent || song.name != mostRecent.name) {
-            // New song started playing since last check
-            mostRecent = song;
+        let StreamerTimestamp = Date.now() - Date.parse(latestVOD.created_at);
 
-            var data = {
-                song: song.name,
-                artist: song.artist,
-                timestamp: Date.now() - Date.parse(latestVOD.created_at)
-            };
-        
-            var fileObject = JSON.parse(fs.readFileSync("song.json"));
+        if (song["@attr"]?.nowplaying === "true") {
+            
+            if (!mostRecent || song.name != mostRecent.name) {
+                mostRecent = song;
+                // New song started playing since last check
 
-            fileObject[VODID] = fileObject[VODID] || []; // Create an entry for the VOD if it does not exist
-            fileObject[VODID].push(data); // Add the currently playing song
-        
-            fs.writeFileSync("song.json", JSON.stringify(fileObject, null, 4));
-            console.log("wrote to file");
+                addSongToVOD(VODID, {
+                    isPlaying: true,
+                    song: song.name,
+                    artist: song.artist,
+                    timestamp: StreamerTimestamp
+                });
+            }
+
+        } else {
+
+            if (mostRecent) {
+                mostRecent = null;
+                // The streamer was playing a song the last time we checked, but not anymore.
+                // They might've stopped it before it ended so we need to keep track of that.
+
+                addSongToVOD(VODID, {
+                    isPlaying: false,
+                    timestamp: StreamerTimestamp
+                });
+            }
+
         }
 
         await sleep(lastFMPollInterval);
