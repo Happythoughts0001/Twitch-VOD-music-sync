@@ -1,12 +1,22 @@
 {
-    "1077318886": [
+    "1081455243": [
         {
-            "song": "Reverie - Above & Beyond Club Mix",
+            "isPlaying": true,
+            "song": "I Know That Smirk",
             "artist": {
                 "mbid": "",
-                "#text": "Above & Beyond"
+                "#text": "RaFa Sessions"
             },
-            "timestamp": 118426814
+            "timestamp": 10780930
+        },
+        {
+            "isPlaying": true,
+            "song": "Without Qualm",
+            "artist": {
+                "mbid": "",
+                "#text": "Dreem"
+            },
+            "timestamp": 10796519
         }
     ]
 }

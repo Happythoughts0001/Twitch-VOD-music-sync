@@ -53,7 +53,7 @@ const twitchID = async () => {
             if (!mostRecent || song.name != mostRecent.name) {
                 mostRecent = song;
                 // New song started playing since last check
-
+                // isPlaying prob not working
                 addSongToVOD(VODID, {
                     isPlaying: true,
                     song: song.name,
