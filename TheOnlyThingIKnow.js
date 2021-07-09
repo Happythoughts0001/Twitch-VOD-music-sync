@@ -1,58 +1,3 @@
-/* Spotify sync for VOD stream
-    Storage of music that happened during the stream issues:
-        -Store in a separate Database with timestamp and VOD ID to make it easier to find song.
-        -How do we get all the songs. What happens if there's a similar song called the same thing, or if it does not exist on youtube.
-    
-
-    Limitations:
-        -Do not want to store songs!
-        -GDPR personal information
-
-
-    Website
-        -Video playing  https://dev.twitch.tv/docs/v5/reference/videos#get-video 
-        -Video/audio sync
-
-    To learn:
-        How do you make a chrome extension.
-        Spotify API? 
-        Does youtube have a decent search function API
-        Communicate with database from extension
-        Login to spotify for playback
-
-
-    
-    {ID: "678121616", Data:
-        {
-            Timestamp: "01:01:01",
-            Song: "Artist - Title"
-        },
-        {
-            Timestamp: "01:03:01",
-            Song: "Artist - Title"
-        },
-        {
-            Timestamp: "01:05:01",
-            Song: "Artist - Title"
-        }
-    },
-    {ID: "132312139", Data:
-        {
-            Timestamp: "01:03:01",
-            Song: "Artist - Title"
-        }
-    },
-
-    When there is no previous saved timestamps for a VOD
-    When there is a previous save timestamp for a VOD
-
-    Create a new file for each VOD iterate through files.
-    Huge file iterate through to find unique VODID
-
-
-    How do we get the streamers timestamp?
-    When we started -> when a new song is detected -> saved into the file
-*/
 // code here
 const axios = require("axios");
 const secretData = require("./secretThings.json");
@@ -73,7 +18,7 @@ const addSongToVOD = (VODID, data) => {
 
     fs.writeFileSync("song.json", JSON.stringify(fileObject, null, 4));
     console.log("wrote to file");
-}
+};
 
 const twitchID = async () => {
     const VODresponse = await axios({
@@ -86,12 +31,15 @@ const twitchID = async () => {
     });
 
     let latestVOD = VODresponse.data.videos.reduce((latest, video) => {
-        return (Date.parse(video.created_at) > Date.parse(latest.created_at)) ? video : latest;
+        return Date.parse(video.created_at) > Date.parse(latest.created_at)
+            ? video
+            : latest;
     });
     let VODID = latestVOD._id.substring(1);
 
     let mostRecent;
-    while (true) { // This loop runs at the interval defined by lastFMPollInterval
+    while (true) {
+        // This loop runs at the interval defined by lastFMPollInterval
         let lastFMResponse = await axios({
             method: "get",
             url: `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${lastFMUsername}&api_key=${secretData.lastFMAPI}&format=json`,
@@ -102,7 +50,6 @@ const twitchID = async () => {
         let StreamerTimestamp = Date.now() - Date.parse(latestVOD.created_at);
 
         if (song["@attr"]?.nowplaying === "true") {
-            
             if (!mostRecent || song.name != mostRecent.name) {
                 mostRecent = song;
                 // New song started playing since last check
@@ -111,12 +58,10 @@ const twitchID = async () => {
                     isPlaying: true,
                     song: song.name,
                     artist: song.artist,
-                    timestamp: StreamerTimestamp
+                    timestamp: StreamerTimestamp,
                 });
             }
-
         } else {
-
             if (mostRecent) {
                 mostRecent = null;
                 // The streamer was playing a song the last time we checked, but not anymore.
@@ -124,20 +69,19 @@ const twitchID = async () => {
 
                 addSongToVOD(VODID, {
                     isPlaying: false,
-                    timestamp: StreamerTimestamp
+                    timestamp: StreamerTimestamp,
                 });
             }
-
         }
 
         await sleep(lastFMPollInterval);
     }
-    
 };
 
 twitchID();
 
 // code ends
+
 /*
 Gifts
     somethingHillZone x Veloe
