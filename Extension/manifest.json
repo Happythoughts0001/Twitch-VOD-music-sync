@@ -8,6 +8,9 @@
             "run_at": "document_end"
         }
     ],
+    "background": {
+        "service_worker": "background.js"
+    },
     "web_accessible_resources": [
         {
             "resources": ["song.json"],
@@ -16,7 +19,14 @@
     ],
     "version": "1.2",
     "manifest_version": 3,
-    "permissions": ["storage", "activeTab", "scripting", "webNavigation"],
+    "permissions": [
+        "identity",
+        "storage",
+        "activeTab",
+        "scripting",
+        "webNavigation",
+        "tabs"
+    ],
     "action": {
         "default_popup": "popup.html"
     }
