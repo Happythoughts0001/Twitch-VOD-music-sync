@@ -36,47 +36,35 @@ function justLogSomething() {
     chrome.runtime.sendMessage({ greeting: "hello" });
 }
 
-async function getTokenFromStorage() {
-    console.log("1");
-    return new Promise((resolve, reject) => {
-        console.log("2");
-        chrome.storage.local.get("youtube_access_token", (items) => {
-            console.log("3");
-            if (runtime.lastError) {
-                console.log("4");
-                return reject(runtime.lastError.message);
-            }
-            console.log("5");
-            return resolve(items.youtube_access_token);
-        });
-    });
-}
+async function youtubeSearch() {
+    var port = chrome.runtime.connect({ name: "token" });
+    port.postMessage({ token: "Give me now" });
+    port.onMessage.addListener(async function (msg) {
+        if (msg.answer === "Here you go") {
+            let token = msg.token;
+            let query = "sodapoppin";
 
-async function youtubeSearch(token) {
-    console.log("yoyo");
-    let query = "sodapoppin";
+            console.log(token);
 
-    console.log("yoyoyo");
-    const params = new URLSearchParams({
-        part: "snippet",
-        maxResults: "1",
-        order: "relevance",
-        q: query,
-        type: "video",
-        // videoEmbeddable: "true",
+            const params = new URLSearchParams({
+                part: "snippet",
+                maxResults: "1",
+                order: "relevance",
+                q: query,
+                type: "video",
+                // videoEmbeddable: "true",
+            });
+            const request = `https://www.googleapis.com/youtube/v3/search?${params.toString()}`;
+            const response = await fetch(request, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: "application/json",
+                },
+            }).then((response) => response.json());
+            console.log(response);
+            return response.items && response.items[0];
+        }
     });
-    console.log("yoyoyo 2");
-    const request = `https://www.googleapis.com/youtube/v3/search?${params.toString()}`;
-    console.log("yoyoyo 3");
-    const response = await fetch(request, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-        },
-    }).then((response) => response.json());
-    console.log("yoyoyo 4");
-    console.log(response);
-    return response.items && response.items[0];
 }
 
 let loginButton = document.getElementById("loginButton");

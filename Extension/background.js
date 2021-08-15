@@ -37,6 +37,16 @@ const signInThing = () => {
         }
     );
 };
+function getTokenFromStorage() {
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get("youtube_access_token", (items) => {
+            if (chrome.runtime.lastError) {
+                return reject(chrome.runtime.lastError.message);
+            }
+            return resolve(items.youtube_access_token);
+        });
+    });
+}
 
 chrome.runtime.onMessage.addListener(function (request, sender) {
     console.log(
@@ -47,4 +57,16 @@ chrome.runtime.onMessage.addListener(function (request, sender) {
     if (request.greeting === "hello") {
         signInThing();
     }
+});
+
+chrome.runtime.onConnect.addListener(function (port) {
+    console.assert(port.name === "token");
+    port.onMessage.addListener(async function (msg) {
+        if (msg.token === "Give me now") {
+            port.postMessage({
+                answer: "Here you go",
+                token: await getTokenFromStorage(),
+            });
+        }
+    });
 });
