@@ -65,5 +65,56 @@
             },
             "timestamp": 5590784
         }
+    ],
+    "1119007044": [
+        {
+            "isPlaying": true,
+            "song": "alive",
+            "artist": {
+                "mbid": "",
+                "#text": "LongLost"
+            },
+            "timestamp": 13476555
+        },
+        {
+            "isPlaying": false,
+            "timestamp": 13584446
+        },
+        {
+            "isPlaying": true,
+            "song": "I Wanted to Die",
+            "artist": {
+                "mbid": "",
+                "#text": "LongLost"
+            },
+            "timestamp": 13585880
+        },
+        {
+            "isPlaying": true,
+            "song": "dreaming",
+            "artist": {
+                "mbid": "",
+                "#text": "LongLost"
+            },
+            "timestamp": 13621684
+        },
+        {
+            "isPlaying": true,
+            "song": "Cola",
+            "artist": {
+                "mbid": "69f3c930-4e8b-4798-9b36-08bd8ffa930c",
+                "#text": "twocolors"
+            },
+            "timestamp": 13634250
+        },
+        {
+            "isPlaying": true,
+            "song": "Wake Me Up - Tale Of Us Remix",
+            "artist": {
+                "mbid": "",
+                "#text": "Cubicolor"
+            },
+            "timestamp": 13809095
+        }
     ]
 }

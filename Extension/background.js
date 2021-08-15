@@ -11,26 +11,28 @@ var generateRandomString = function (length) {
 
 const signInThing = () => {
     var state = generateRandomString(16);
-    var scope = "user-read-private user-read-email";
 
     const params = new URLSearchParams({
-        client_id: "486b16a2dc7c496399995876df6d6d10",
-        response_type: "code",
-        scope: scope,
+        client_id:
+            "996847469157-6vc74nlrgn2fhv9b2273stm8cphf66ds.apps.googleusercontent.com",
+        response_type: "token",
+        scope: "https://www.googleapis.com/auth/youtube.readonly",
         redirect_uri: chrome.identity.getRedirectURL(),
         state: state,
     });
-    const request = `https://accounts.spotify.com/authorize?${params.toString()}`;
+
+    const request = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
 
     chrome.identity.launchWebAuthFlow(
         { url: request, interactive: true },
         (response) => {
             const responseObj = new URLSearchParams(
-                new URL(response).search.substring(1)
+                new URL(response).hash.substring(1)
             );
 
-            const token = responseObj.get("code");
+            const token = responseObj.get("access_token");
             const state = responseObj.get("state");
+            chrome.storage.local.set({ youtube_access_token: token });
             console.log("token: ", token, "state: ", state);
         }
     );
