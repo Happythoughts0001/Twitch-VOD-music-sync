@@ -138,4 +138,23 @@ Gifts
     Rath_Nova jerrydacarry
     Animatrix13 2 months
     Its_me_BUD 9 months
+    redrosey1 7 months
+    m3zs 4 months
+    miraitre 10 months
+    dreken337 2 months
+    ogpommom 2 months
+    Karagiram 10 months
+    afk_krogenth 4 months
+    grimmten10 6 months
+    cruptoodude 10 months
+    Zangetsu199O PATIIIIIIII
+    Muriellecom 2 months
+    Heads_Up 5 months
+    HDSolly SergeantPleb
+    lewdmop 8 months
+    ItMeWindy 10 months
+    Ezaah 8 months
+    Dreken337 3 months
+    suvyx 11 months
+    fourth13 T3<3 11 months
     */

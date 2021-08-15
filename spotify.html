@@ -10,12 +10,28 @@
   <!-- Load the Spotify Web Playback SDK -->
 <script src="https://sdk.scdn.co/spotify-player.js"></script>
 
+<!-- http://localhost:8888/callback -->
+
 <script>
     fetch('./secretThings.json').then(response=> {
         return response.json().then((data) => {
             secrets=data
             // Called when the Spotify Web Playback SDK is ready to use
             window.onSpotifyWebPlaybackSDKReady = () => {
+                fetch("https://accounts.spotify.com/api/token", {
+                                method: 'POST',
+                                mode: "cors",
+                                headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Basic ${window.btoa(data.client_id + ":" + data.client_secret).toString("base64")}`
+                                },
+                                form: {
+                                    grant_type: "client_credentials",
+                                },
+                                json: true
+                            }).then(response => {
+                                console.log(response);
+                            });
 
                 // Define the Spotify Connect device, getOAuthToken has an actual token 
                 // hardcoded for the sake of simplicity
@@ -53,12 +69,24 @@
                         });
                     };
 
-                    play({
+                        let track = "uppercut"
+
+                        fetch(`https://api.spotify.com/v1/search?q=${track}&type=track` , {
+                                method: 'GET',
+                                headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${secrets.access_token}`
+                                },
+                            }).then(response => {
+                                console.log(response);
+                            });
+                        
+
+                    /* play({
                         playerInstance: player,
                         spotify_uri: 'spotify:track:7kW8KlDA7A2Fie3IY299FX',
-                    });
+                    }); */
                 });
-
                 // Connect to the player created beforehand, this is equivalent to 
                 // creating a new device which will be visible for Spotify Connect
                 player.connect();
@@ -67,6 +95,5 @@
     })
 
 </script>
-  <button onclick="play">Play</button>
 </body>
 </html>

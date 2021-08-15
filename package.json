@@ -5,6 +5,8 @@
     "author": "HappyThoughts",
     "license": "MIT",
     "dependencies": {
-        "axios": "^0.21.1"
+        "axios": "^0.21.1",
+        "browserify": "^17.0.0",
+        "request": "^2.88.2"
     }
 }
