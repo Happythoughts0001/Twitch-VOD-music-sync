@@ -14,7 +14,7 @@ const signInThing = () => {
 
     const params = new URLSearchParams({
         client_id:
-            "996847469157-6vc74nlrgn2fhv9b2273stm8cphf66ds.apps.googleusercontent.com",
+            "996847469157-c3k7sf34m7cdso8flpmvambsvu1f623u.apps.googleusercontent.com",
         response_type: "token",
         scope: "https://www.googleapis.com/auth/youtube.readonly",
         redirect_uri: chrome.identity.getRedirectURL(),

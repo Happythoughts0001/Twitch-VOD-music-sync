@@ -36,35 +36,41 @@ function justLogSomething() {
     chrome.runtime.sendMessage({ greeting: "hello" });
 }
 
-async function youtubeSearch() {
-    var port = chrome.runtime.connect({ name: "token" });
-    port.postMessage({ token: "Give me now" });
-    port.onMessage.addListener(async function (msg) {
-        if (msg.answer === "Here you go") {
-            let token = msg.token;
-            let query = "sodapoppin";
-
-            console.log(token);
-
-            const params = new URLSearchParams({
-                part: "snippet",
-                maxResults: "1",
-                order: "relevance",
-                q: query,
-                type: "video",
-                // videoEmbeddable: "true",
-            });
-            const request = `https://www.googleapis.com/youtube/v3/search?${params.toString()}`;
-            const response = await fetch(request, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    Accept: "application/json",
-                },
-            }).then((response) => response.json());
-            console.log(response);
-            return response.items && response.items[0];
-        }
+function getTokenFromStorage() {
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get("youtube_access_token", (items) => {
+            if (chrome.runtime.lastError) {
+                return reject(chrome.runtime.lastError.message);
+            }
+            return resolve(items.youtube_access_token);
+        });
     });
+}
+
+async function youtubeSearch() {
+    let token = await getTokenFromStorage();
+    let query = "HappyThoughts";
+
+    console.log(token);
+
+    const params = new URLSearchParams({
+        part: "snippet",
+        maxResults: "1",
+        order: "relevance",
+        q: query,
+        type: "video",
+        // videoEmbeddable: "true",
+    });
+    const request = `https://www.googleapis.com/youtube/v3/search?${params.toString()}`;
+    const response = await fetch(request, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+        },
+    }).then((response) => response.json());
+
+    console.log("response", response);
+    return response.items[0].id.videoId;
 }
 
 let loginButton = document.getElementById("loginButton");
@@ -81,9 +87,7 @@ loginButton.addEventListener("click", async () => {
 
 timeButton.addEventListener("click", async () => {
     let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    let youtubeID = await youtubeSearch();
 
-    chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        function: youtubeSearch,
-    });
+    chrome.tabs.sendMessage(tab.id, { greeting: "Embed Video", youtubeID });
 });

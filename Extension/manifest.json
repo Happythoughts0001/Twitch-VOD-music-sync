@@ -4,8 +4,8 @@
     "content_scripts": [
         {
             "matches": ["https://www.twitch.tv/videos/*"],
-            "js": ["popup.js"],
-            "run_at": "document_end"
+            "js": ["embed.js"],
+            "run_at": "document_idle"
         }
     ],
     "background": {
@@ -13,7 +13,7 @@
     },
     "web_accessible_resources": [
         {
-            "resources": ["song.json"],
+            "resources": ["song.json", "youtube_api.js"],
             "matches": ["<all_urls>"]
         }
     ],
