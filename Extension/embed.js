@@ -19,12 +19,18 @@ chrome.runtime.onMessage.addListener(async function (request, sender) {
 function getLatestSong(arrayOfSongs, time) {
     return [...arrayOfSongs].reverse().find((song) => song.timestamp <= time);
 }
+let fileObject = "";
+
+async function test() {
+    await fetch(chrome.runtime.getURL("song.json")).then(async (response) => {
+        console.log("we tried");
+        fileObject = await response.json();
+        setInterval(getTime, 1000);
+        return fileObject;
+    });
+}
 
 async function getTime() {
-    fileObject = await fetch(chrome.runtime.getURL("song.json")).then(
-        (response) => response.json()
-    );
-
     let twitchID = document.location.pathname.split("/").slice(-1)[0];
     if (fileObject[twitchID]) {
         let timerElement = document.querySelector(
@@ -32,7 +38,7 @@ async function getTime() {
         );
         let time = timerElement.currentTime * 1000;
         latestSong = getLatestSong(fileObject[twitchID], time);
-
+        console.log(latestSong);
         return latestSong;
         /* let proofcheck = 0;
         let intervalVariable = setInterval(() => {
@@ -49,3 +55,5 @@ async function getTime() {
         }, 1000); */
     }
 }
+
+test();
