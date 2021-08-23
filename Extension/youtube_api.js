@@ -1,6 +1,22 @@
 let temp = document.createElement("div");
 temp.id = "player";
 document.body.appendChild(temp);
+
+let controls = document.createElement("div");
+controls.id = "controls";
+controls.innerHTML = `<div style="background-color: grey; position: fixed; padding: .5rem; top: 20px; z-index: 9999">
+<button onclick=playVideo()>Play</button>
+<button onclick=pauseVideo()>Pause</button>
+<input type="range" min="1" max="100" value="20" class="slider" id="volumeRange">
+</div>`;
+document.body.appendChild(controls);
+
+let volumeSlider = document.getElementById("volumeRange");
+
+volumeSlider.oninput = function () {
+    player.setVolume(this.value);
+};
+
 // 2. This code loads the IFrame Player API code asynchronously.
 var tag = document.createElement("script");
 
@@ -13,17 +29,16 @@ firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 var player;
 window.onYouTubeIframeAPIReady = () => {
     player = new YT.Player("player", {
-        height: "390",
-        width: "640",
+        height: "500",
+        width: "500",
+        videoId: "pulV9N8-DXs",
         playerVars: {
             playsinline: 1,
         },
         events: {
             onReady: onPlayerReady,
-            onStateChange: onPlayerStateChange,
         },
     });
-    player.setVolume(20);
 };
 
 // 4. The API will call this function when the video player is ready.
@@ -31,21 +46,13 @@ function onPlayerReady(event) {
     event.target.playVideo();
 }
 
-// 5. The API calls this function when the player's state changes.
-//    The function indicates that when playing a video (state=1),
-//    the player should play for six seconds and then stop.
-var done = false;
-function onPlayerStateChange(event) {
-    if (event.data == YT.PlayerState.PLAYING && !done) {
-        setTimeout(stopVideo, 6000);
-        done = true;
-    }
-}
-function stopVideo() {
-    player.stopVideo();
+function pauseVideo() {
+    player.pauseVideo();
 }
 
-var port = chrome.runtime.connect();
+function playVideo() {
+    player.playVideo();
+}
 
 window.addEventListener(
     "message",
@@ -56,8 +63,7 @@ window.addEventListener(
         }
 
         if (event.data.type && event.data.type == "FROM_PAGE") {
-            console.log("Content script received: " + event.data.text);
-            port.postMessage(event.data.text);
+            console.log("Content script received: ");
             player.loadVideoById(event.data.youtubeID);
         }
     },

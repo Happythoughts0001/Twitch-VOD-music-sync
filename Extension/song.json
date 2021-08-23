@@ -106,6 +106,62 @@
                 "#text": "twocolors"
             },
             "timestamp": 13634250
+        },
+        {
+            "isPlaying": true,
+            "song": "Wake Me Up - Tale Of Us Remix",
+            "artist": {
+                "mbid": "",
+                "#text": "Cubicolor"
+            },
+            "timestamp": 13809095
+        }
+    ],
+    "1127038460": [
+        {
+            "isPlaying": true,
+            "song": "Chained w/ OPEN",
+            "artist": {
+                "mbid": "",
+                "#text": "IOSHI"
+            },
+            "timestamp": 7360968
+        },
+        {
+            "isPlaying": true,
+            "song": "MONEY",
+            "artist": {
+                "mbid": "",
+                "#text": "MACSWOLRD"
+            },
+            "timestamp": 7378414
+        },
+        {
+            "isPlaying": true,
+            "song": "REMIND ME w/SEKIZO",
+            "artist": {
+                "mbid": "",
+                "#text": "NVDO"
+            },
+            "timestamp": 7421082
+        },
+        {
+            "isPlaying": true,
+            "song": "BREAK DA BANK W/BERRYMANE",
+            "artist": {
+                "mbid": "",
+                "#text": "Sekizo."
+            },
+            "timestamp": 7428085
+        },
+        {
+            "isPlaying": true,
+            "song": "SHIFT",
+            "artist": {
+                "mbid": "",
+                "#text": "DOWNPRESSOR X SNAKE"
+            },
+            "timestamp": 7468079
         }
     ]
 }
