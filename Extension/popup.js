@@ -16,7 +16,7 @@ function getTokenFromStorage() {
 async function youtubeSearch(song, artist) {
     let token = await getTokenFromStorage();
     let query = song + " " + artist;
-
+    console.log("query ", query);
     const params = new URLSearchParams({
         part: "snippet",
         maxResults: "1",
