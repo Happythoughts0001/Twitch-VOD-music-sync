@@ -19,6 +19,12 @@ chrome.runtime.onMessage.addListener(async function (request, sender) {
 let fileObject = "";
 let start = "";
 let songs = "";
+let currentSong = {
+    name: null,
+    artist: {
+        "#text": null,
+    },
+};
 
 function getLatestSong(time, start) {
     return songs
@@ -55,20 +61,7 @@ async function test() {
 
     songs = songs.recenttracks.track;
     getTime();
-    /* await fetch(chrome.runtime.getURL("song.json")).then(async (response) => {
-        console.log("we tried");
-        fileObject = await response.json();
-        setInterval(getTime, 1000);
-        return fileObject;
-    }); */
 }
-
-let currentSong = {
-    name: null,
-    artist: {
-        "#text": null,
-    },
-};
 
 async function getPlayerTime() {
     if (songs) {
