@@ -9,7 +9,7 @@ var generateRandomString = function (length) {
     return text;
 };
 
-const signInThing = () => {
+const webAuthSignIn = () => {
     var state = generateRandomString(16);
 
     const params = new URLSearchParams({
@@ -37,6 +37,7 @@ const signInThing = () => {
         }
     );
 };
+
 function getTokenFromStorage() {
     return new Promise((resolve, reject) => {
         chrome.storage.local.get("youtube_access_token", (items) => {
@@ -55,7 +56,7 @@ chrome.runtime.onMessage.addListener(function (request, sender) {
             : "from the extension"
     );
     if (request.greeting === "hello") {
-        signInThing();
+        webAuthSignIn();
     }
 });
 
